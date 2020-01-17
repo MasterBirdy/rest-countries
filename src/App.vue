@@ -1,37 +1,65 @@
 <template>
-    <div id="app">
-        <header>
+    <div id="app" :class="{ 'dark-mode': darkMode }">
+        <header :class="{ 'dark-mode': darkMode }">
             <div class="container">
                 <div class="inside">
-                    <h1>Where in the world?</h1>
-                    <h2 id="text-mode">
-                        <i class="fa fa-moon-o" aria-hidden="true"></i>
-                        Dark Mode
+                    <h1 :class="{ 'dark-mode': darkMode }">
+                        Where in the world?
+                    </h1>
+                    <h2
+                        id="text-mode"
+                        @click="darkMode = !darkMode"
+                        :class="{ 'dark-mode': darkMode }"
+                    >
+                        <template v-if="!darkMode">
+                            <i class="fa fa-sun-o" aria-hidden="true"></i>
+                            Light Mode
+                        </template>
+                        <template v-else>
+                            <i class="fa fa-moon-o" aria-hidden="true"></i>
+                            Dark Mode
+                        </template>
                     </h2>
                 </div>
             </div>
         </header>
-        <div class="container">
+        <div class="container body">
             <transition name="fadeAll" mode="out-in">
                 <div v-if="showAllCountries">
                     <div class="inside flexstart">
-                        <input
-                            type="text"
-                            placeholder="Search for a country..."
-                            v-model="countryName"
-                        />
+                        <div class="input-holder">
+                            <input
+                                :class="{ 'dark-mode': darkMode }"
+                                type="text"
+                                placeholder="Search for a country..."
+                                v-model="countryName"
+                            />
+                            <i class="fa fa-search"></i>
+                        </div>
                         <div class="filter-holder">
-                            <button @click="showFilterList = !showFilterList">
+                            <button
+                                :class="{ 'dark-mode': darkMode }"
+                                @click="showFilterList = !showFilterList"
+                            >
                                 Filter by Region
                                 <i class="fa fa-chevron-right"></i>
                             </button>
                             <transition name="fade">
-                                <ul v-if="showFilterList">
-                                    <li>Africa</li>
-                                    <li>America</li>
-                                    <li>Asia</li>
-                                    <li>Europe</li>
-                                    <li>Oceania</li>
+                                <ul
+                                    v-if="showFilterList"
+                                    :class="{ 'dark-mode': darkMode }"
+                                >
+                                    <li
+                                        v-for="region in listOfRegions"
+                                        :key="region"
+                                        @click="test"
+                                        :class="{
+                                            'high-light': region === myRegion,
+                                            'dark-mode': darkMode
+                                        }"
+                                    >
+                                        {{ region }}
+                                    </li>
                                 </ul>
                             </transition>
                         </div>
@@ -45,12 +73,14 @@
                             :countryName="country.name"
                             :region="country.region"
                             :capital="country.capital"
+                            :darkMode="darkMode"
                             @clicked="switchModes"
                         ></country-mini>
                     </div>
                 </div>
                 <country-view
                     :currentCountry="currentCountry"
+                    :darkMode="darkMode"
                     @returnBack="showAllCountries = true"
                     v-else
                 ></country-view>
@@ -72,8 +102,11 @@ export default {
     },
     data() {
         return {
+            myRegion: "",
+            listOfRegions: ["Africa", "America", "Asia", "Europe", "Oceania"],
             showAllCountries: true,
             showFilterList: false,
+            darkMode: false,
             myCountries: [],
             countryName: "",
             currentCountry: {
@@ -108,12 +141,26 @@ export default {
             } else {
                 console.log("ERROR");
             }
+        },
+        test(e) {
+            let testRegion = e.target.textContent.trim();
+            if (testRegion === this.myRegion) {
+                this.myRegion = "";
+            } else {
+                this.myRegion = testRegion;
+            }
+            this.showFilterList = false;
         }
     },
     computed: {
         filteredCountries() {
-            return this.myCountries.filter(country =>
+            return this.regionFilter.filter(country =>
                 this.matchName(country.name)
+            );
+        },
+        regionFilter() {
+            return this.myCountries.filter(country =>
+                country.region.includes(this.myRegion)
             );
         }
     },
@@ -162,22 +209,46 @@ export default {
     box-sizing: border-box;
 }
 
+#app {
+    padding-bottom: 1rem;
+    min-height: 100vh;
+}
+
+#app.dark-mode {
+    background-color: hsl(207, 26%, 17%);
+}
+
 h1 {
     font-size: 1.5rem;
     color: hsl(200, 15%, 8%);
+}
+
+h1.dark-mode {
+    color: white;
 }
 
 h2 {
     font-size: 1.1rem;
     font-weight: 600;
     color: hsl(200, 15%, 8%);
+    user-select: none;
+    cursor: pointer;
+}
+
+h2.dark-mode {
+    color: white;
 }
 
 header {
     width: 100%;
     padding: 1.5rem 0;
     box-shadow: 0 -4px 12px 0px rgb(136, 136, 136);
-    margin-bottom: 2rem;
+    background-color: white;
+}
+
+header.dark-mode {
+    background-color: hsl(209, 23%, 22%);
+    box-shadow: 0 2px 4px 2px rgba(10, 10, 10, 0.473);
 }
 
 body {
@@ -187,6 +258,11 @@ body {
 
 .container {
     padding: 0 5rem;
+}
+
+.container.body {
+    max-width: 1600px;
+    margin: 0 auto;
 }
 
 .filter-holder {
@@ -214,7 +290,7 @@ body {
     padding: 0.75rem 0;
     margin-top: 0.25rem;
     box-shadow: 0 2px 4px 2px rgb(238, 238, 238);
-    background-color: hsl(0, 0%, 98%);
+    background-color: white;
     font-family: "Nunito Sans", sans-serif;
     font-size: 14px;
     border-radius: 5px;
@@ -232,19 +308,46 @@ body {
     background-color: hsl(0, 0%, 92%);
 }
 
+.inside.flexstart ul li:hover.dark-mode {
+    background-color: hsl(0, 0%, 50%);
+}
+
+.inside.flexstart ul li.high-light {
+    background-color: orange;
+}
+
+.inside.flexstart ul li.high-light.dark-mode {
+    background-color: rgb(219, 113, 52);
+}
+
+.input-holder {
+    max-width: 30rem;
+    width: 100%;
+}
+
 input[type="text"] {
     display: inline-block;
     padding: 1.25rem;
     padding-left: 4.5rem;
     font-family: "Nunito Sans", sans-serif;
     font-size: 14px;
-
     box-shadow: 0 0 7px 3px rgb(238, 238, 238);
     border: 0;
     width: 100%;
-    max-width: 30rem;
     border-radius: 5px;
     color: hsl(0, 0%, 52%);
+}
+
+input[type="text"].dark-mode,
+button.dark-mode,
+.inside.inside.flexstart ul.dark-mode {
+    background-color: hsl(209, 23%, 22%);
+    color: white;
+    box-shadow: 0 2px 4px 2px rgba(10, 10, 10, 0.473);
+}
+
+input[type="text"].dark-mode::placeholder {
+    color: white;
 }
 
 button {
@@ -297,7 +400,6 @@ button {
 
 .country-holder {
     margin-top: 3.5rem;
-    margin-bottom: 1rem;
     display: grid;
     justify-items: center;
     grid-template-columns: repeat(6, 1fr);
@@ -307,6 +409,20 @@ button {
 
 #text-mode {
     cursor: pointer;
+}
+
+.input-holder {
+    position: relative;
+}
+
+.input-holder i {
+    position: absolute;
+    top: 45%;
+    left: 0;
+    font-size: 1.5rem;
+    color: hsl(0, 0%, 52%);
+    transform: translateY(-45%);
+    margin-left: 1.5rem;
 }
 
 @media screen and (max-width: 2250px) {
@@ -333,7 +449,36 @@ button {
     }
 }
 
-@media screen and (max-width: 800px) {
+@media screen and (max-width: 850px) {
+    .container {
+        padding: 0;
+        width: 92%;
+        margin: 0 auto;
+    }
+
+    h1 {
+        font-size: 18px;
+    }
+
+    h2 {
+        font-size: 16px;
+    }
+
+    .inside.flexstart {
+        margin-top: 1.5rem;
+        flex-direction: column;
+    }
+
+    .country-holder {
+        margin-top: 1.5rem;
+        grid-row-gap: 3rem;
+    }
+
+    .inside.flexstart button {
+        margin-top: 1rem;
+    }
+}
+@media screen and (max-width: 630px) {
     .country-holder {
         grid-template-columns: 1fr;
     }

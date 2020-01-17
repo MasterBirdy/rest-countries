@@ -1,7 +1,11 @@
 <template>
-    <div class="parent" @click="$emit('clicked', countryName)">
+    <div
+        class="parent"
+        @click="$emit('clicked', countryName)"
+        :class="{ 'dark-mode': darkMode }"
+    >
         <div class="flag" :style="{ backgroundImage: `url('${flag}')` }"></div>
-        <ul>
+        <ul :class="{ 'dark-mode': darkMode }">
             <li>
                 <h3>{{ countryName }}</h3>
             </li>
@@ -17,7 +21,7 @@
                     {{ region }}
                 </p>
             </li>
-            <li>
+            <li v-if="capital != ''">
                 <p>
                     <strong>Capital:</strong>
                     {{ capital }}
@@ -35,7 +39,8 @@ export default {
         countryName: String,
         population: String,
         region: String,
-        capital: String
+        capital: String,
+        darkMode: Boolean
     }
 };
 </script>
@@ -46,14 +51,25 @@ div.parent {
     justify-items: flex-start;
     grid-template-rows: 1fr 1fr;
     border-radius: 10px;
-    width: 300px;
+    width: 100%;
+    max-width: 300px;
     box-shadow: 0 2px 6px 4px rgb(233, 233, 233);
     cursor: pointer;
 }
 
+div.parent.dark-mode {
+    box-shadow: 0 2px 4px 2px rgba(10, 10, 10, 0.473);
+}
+
+div.parent.dark-mode,
+ul.dark-mode li {
+    background-color: hsl(209, 23%, 22%);
+    color: white;
+}
+
 ul {
     list-style: none;
-    padding: 1.25rem 0.5rem 2.5rem 2rem;
+    padding: 1.25rem 0.5rem 2.5rem 1.25rem;
 }
 
 li {

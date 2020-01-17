@@ -1,15 +1,20 @@
 <template>
     <div class="parent">
-        <button @click="$emit('returnBack')">
+        <button @click="$emit('returnBack')" :class="{ 'dark-mode': darkMode }">
             <i class="fa fa-arrow-left"></i> Back
         </button>
         <div class="theGrid">
             <img :src="currentCountry.flag" alt />
             <div class="flex">
                 <div>
-                    <h1>{{ currentCountry.name }}</h1>
+                    <h1 :class="{ 'dark-mode': darkMode }">
+                        {{ currentCountry.name }}
+                    </h1>
                     <div class="grid-content">
-                        <ul class="grid-contents-left">
+                        <ul
+                            class="grid-contents-left"
+                            :class="{ 'dark-mode': darkMode }"
+                        >
                             <li>
                                 <p>
                                     <strong>Native Name:</strong>
@@ -28,25 +33,28 @@
                                     {{ currentCountry.region }}
                                 </p>
                             </li>
-                            <li>
+                            <li v-if="currentCountry.subregion != ''">
                                 <p>
                                     <strong>Sub Region:</strong>
                                     {{ currentCountry.subregion }}
                                 </p>
                             </li>
-                            <li>
+                            <li v-if="currentCountry.capital != ''">
                                 <p>
                                     <strong>Capital:</strong>
                                     {{ currentCountry.capital }}
                                 </p>
                             </li>
                         </ul>
-                        <ul class="grid-contents-right">
+                        <ul
+                            class="grid-contents-right"
+                            :class="{ 'dark-mode': darkMode }"
+                        >
                             <li>
                                 <p>
                                     <strong>Top Level Domain:</strong>
                                     {{
-                                    currentCountry.topLevelDomain.join(", ")
+                                        currentCountry.topLevelDomain.join(", ")
                                     }}
                                 </p>
                             </li>
@@ -65,15 +73,21 @@
                         </ul>
                     </div>
                 </div>
-                <div class="border-countries" v-if="currentCountry.borderCountries.length !== 0">
+                <div
+                    class="border-countries"
+                    v-if="currentCountry.borderCountries.length !== 0"
+                    :class="{ 'dark-mode': darkMode }"
+                >
                     <p>
                         <strong class="border-title">Border Countries:</strong>
                     </p>
                     <span
                         class="border-country"
                         v-for="country in currentCountry.borderCountries"
+                        :class="{ 'dark-mode': darkMode }"
                         :key="country"
-                    >{{ country }}</span>
+                        >{{ country }}</span
+                    >
                 </div>
             </div>
         </div>
@@ -84,7 +98,8 @@
 export default {
     name: "countryView",
     props: {
-        currentCountry: Object
+        currentCountry: Object,
+        darkMode: Boolean
     }
 };
 </script>
@@ -159,5 +174,32 @@ button {
 
 i {
     margin-right: 0.5rem;
+}
+
+h1.dark-mode,
+ul.dark-mode,
+.border-countries.dark-mode {
+    color: white;
+}
+
+.border-country.dark-mode {
+    background-color: hsl(209, 23%, 22%);
+    box-shadow: 0 2px 4px 2px rgba(10, 10, 10, 0.473);
+}
+
+@media screen and (max-width: 630px) {
+    .parent {
+        margin-top: 2rem;
+    }
+
+    .theGrid {
+        grid-template-columns: 1fr;
+        grid-row-gap: 1.5rem;
+    }
+
+    .grid-content {
+        grid-template-columns: 1fr;
+        grid-row-gap: 1rem;
+    }
 }
 </style>
