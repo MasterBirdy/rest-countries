@@ -84,6 +84,7 @@
                     <span
                         class="border-country"
                         v-for="country in currentCountry.borderCountries"
+                        @click="$emit('changeCountry', country)"
                         :class="{ 'dark-mode': darkMode }"
                         :key="country"
                         >{{ country }}</span
@@ -154,6 +155,7 @@ p {
 }
 
 span.border-country {
+    cursor: pointer;
     border: 1px solid rgb(192, 192, 192);
     padding: 0.15rem 1.25rem;
     border-radius: 5px;

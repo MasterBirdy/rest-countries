@@ -82,6 +82,7 @@
                     :currentCountry="currentCountry"
                     :darkMode="darkMode"
                     @returnBack="showAllCountries = true"
+                    @changeCountry="switchModes"
                     v-else
                 ></country-view>
             </transition>
@@ -138,8 +139,6 @@ export default {
             if (newCountry != null) {
                 this.currentCountry = newCountry;
                 this.showAllCountries = false;
-            } else {
-                console.log("ERROR");
             }
         },
         test(e) {
@@ -178,22 +177,23 @@ export default {
                         flag: country.flag,
                         nativeName: country.nativeName,
                         subregion: country.subregion,
-                        topLevelDomain: country.topLevelDomain //array
+                        topLevelDomain: country.topLevelDomain,
+                        currencies: [],
+                        languages: [],
+                        borderCountries: []
                     };
-                    aCountry.currencies = [];
                     country.currencies.forEach(currency =>
                         aCountry.currencies.push(currency.name)
                     );
-                    aCountry.languages = [];
                     country.languages.forEach(language =>
                         aCountry.languages.push(language.name)
                     );
-                    aCountry.borderCountries = [];
-                    country.borders.forEach(borderCountry =>
-                        aCountry.borderCountries.push(
-                            countries.getName(borderCountry, "en")
-                        )
-                    );
+                    country.borders.forEach(borderCountry => {
+                        const name = countries.getName(borderCountry, "en");
+                        if (name) {
+                            aCountry.borderCountries.push(name);
+                        }
+                    });
                     this.myCountries.push(aCountry);
                 });
             })
@@ -376,7 +376,7 @@ button {
 .fade-enter-active,
 .fade-leave-active {
     transform: translateY(0);
-    transition: all 0.4s ease-out;
+    transition: all 0.32s ease-out;
     pointer-events: all;
 }
 .fade-enter,
@@ -388,7 +388,7 @@ button {
 
 .fadeAll-enter-active,
 .fadeAll-leave-active {
-    transition: all 0.4s ease-out;
+    transition: all 0.32s ease-out;
     pointer-events: all;
 }
 
@@ -402,7 +402,7 @@ button {
     margin-top: 3.5rem;
     display: grid;
     justify-items: center;
-    grid-template-columns: repeat(6, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     grid-row-gap: 15rem;
     grid-column-gap: 2rem;
 }
@@ -425,25 +425,13 @@ button {
     margin-left: 1.5rem;
 }
 
-@media screen and (max-width: 2250px) {
-    .country-holder {
-        grid-template-columns: repeat(5, 1fr);
-    }
-}
-
-@media screen and (max-width: 1900px) {
-    .country-holder {
-        grid-template-columns: repeat(4, 1fr);
-    }
-}
-
 @media screen and (max-width: 1450px) {
     .country-holder {
         grid-template-columns: repeat(3, 1fr);
     }
 }
 
-@media screen and (max-width: 1050px) {
+@media screen and (max-width: 1100px) {
     .country-holder {
         grid-template-columns: repeat(2, 1fr);
     }
